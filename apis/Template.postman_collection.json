@@ -1,0 +1,1683 @@
+{
+	"info": {
+		"_postman_id": "33f92484-814d-4db7-abd9-ef63c4848f18",
+		"name": "Template",
+		"description": "Documentación de apis\n\nLas apis protegidas requieren del uso de un token de acceso de tipo Bearer.\n\n|  | Content |\n| --- | --- |\n| Authorization | Bearer {{token}} |\n\n⚠️ **Ejemplo token requerido**\n\n- Código HTTP: 401\n    \n\n``` json\n{\n    \"severity\": \"error\",\n    \"message\": \"El token de acceso del usuario ha expirado\"\n}\n\n ```",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "30409359"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"try {",
+									"    const response = pm.response.json();",
+									"    console.log(\"Response JSON:\", response);",
+									"",
+									"    // Validación segura para evitar errores si alguna clave no existe",
+									"    const token = response?.data?.token;",
+									"",
+									"    if (token) {",
+									"        pm.environment.set(\"token\", token);",
+									"        console.log(\"✅ Token saved to environment variable:\", token);",
+									"    } else {",
+									"        console.warn(\"⚠️ Token not found in response structure.\");",
+									"    }",
+									"} catch (error) {",
+									"    console.error(\"❌ Error parsing response or setting variable:\", error);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"user.sadmin@template.com\",\n    \"password\": \"user.sadmin\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/v1/auth/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"login"
+							]
+						},
+						"description": "Al realizar una solicitud de inicio de sesión satisfactoria, el sistema retorna un **token de acceso válido por una hora**, junto con la información básica del usuario autenticado. Este token deberá ser utilizado para el consumo de las APIs protegidas.\n\n🔒 Validaciones del token\n\n1. Si ya existe un token generado para el usuario:\n    \n    1. Se verifica que aún esté activo y no haya expirado.\n        \n    2. Si el token sigue siendo válido, **se reutiliza** y se retorna en la respuesta.\n        \n    3. En caso contrario, se genera un **nuevo token de acceso**.\n        \n2. Si no existe un token previamente generado:\n    \n    1. Se genera un **nuevo token de acceso**.\n        \n\n✅ **Ejemplo de respuesta exitosa**\n\n- Código HTTP: 200\n    \n\n``` json\n{\n    \"severity\": \"success\",\n    \"message\": \"Inicio de sesión exitoso... bienvenido!!!\",\n    \"data\": {\n        \"id\": 1,\n        \"name\": \"User\",\n        \"lastName\": \"Super admin\",\n        \"email\": \"user.sadmin@template.com\",\n        \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJ1c2VyLnNhZG1pbkB0ZW1wbGF0ZS5jb20iLCJpYXQiOjE3NTE1OTE3MzksImV4cCI6MTc1MTU5NTMzOX0.DFSQakQvJH0GKwy8fdqD0yjAB5z-Golck-3Wnq3NX54\",\n        \"iat\": 1751591739,\n        \"exp\": 1751595339,\n        \"roles\": [\n            {\n                \"id\": 1,\n                \"name\": \"Súper Admin\",\n                \"key\": \"root\"\n            }\n        ],\n        \"permissions\": {\n            \"user\": [\n                {\n                    \"description\": \"Crear\",\n                    \"action\": \"create\"\n                },\n                {\n                    \"description\": \"Leer\",\n                    \"action\": \"read\"\n                },\n                {\n                    \"description\": \"Actualizar\",\n                    \"action\": \"update\"\n                },\n                {\n                    \"description\": \"Eliminar\",\n                    \"action\": \"delete\"\n                }\n            ],\n            \"role\": [\n                {\n                    \"description\": \"Crear\",\n                    \"action\": \"create\"\n                },\n                {\n                    \"description\": \"Leer\",\n                    \"action\": \"read\"\n                },\n                {\n                    \"description\": \"Actualizar\",\n                    \"action\": \"update\"\n                },\n                {\n                    \"description\": \"Eliminar\",\n                    \"action\": \"delete\"\n                }\n            ],\n            \"dashboard\": [\n                {\n                    \"description\": \"Crear\",\n                    \"action\": \"create\"\n                },\n                {\n                    \"description\": \"Leer\",\n                    \"action\": \"read\"\n                },\n                {\n                    \"description\": \"Actualizar\",\n                    \"action\": \"update\"\n                },\n                {\n                    \"description\": \"Eliminar\",\n                    \"action\": \"delete\"\n                }\n            ]\n        }\n    }\n}\n\n ```\n\n⚠️ **Ejemplo de respuesta por validación de campos inválidos**\n\n- Código HTTP: 422\n    \n\n``` json\n{\n    \"severity\": \"warning\",\n    \"message\": \"Validación de campos\",\n    \"data\": [\n        \"El correo es requerido\",\n        \"El correo no es válido\",\n        \"La contraseña es requerida\"\n    ]\n}\n\n ```"
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"user.sadmin@template.com\",\n    \"password\": \"user.sadmin\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:3000/api/v1/auth/login",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"v1",
+										"auth",
+										"login"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "1017"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"3f9-sIptyKa5/Q7shQK1KiLNq3JzTHA\""
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 04 Jul 2025 01:15:39 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"severity\": \"success\",\n    \"message\": \"Inicio de sesión exitoso... bienvenido!!!\",\n    \"data\": {\n        \"id\": 1,\n        \"name\": \"User\",\n        \"lastName\": \"Super admin\",\n        \"email\": \"user.sadmin@template.com\",\n        \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJ1c2VyLnNhZG1pbkB0ZW1wbGF0ZS5jb20iLCJpYXQiOjE3NTE1OTE3MzksImV4cCI6MTc1MTU5NTMzOX0.DFSQakQvJH0GKwy8fdqD0yjAB5z-Golck-3Wnq3NX54\",\n        \"iat\": 1751591739,\n        \"exp\": 1751595339,\n        \"roles\": [\n            {\n                \"id\": 1,\n                \"name\": \"Súper Admin\",\n                \"key\": \"root\"\n            }\n        ],\n        \"permissions\": {\n            \"user\": [\n                {\n                    \"description\": \"Crear\",\n                    \"action\": \"create\"\n                },\n                {\n                    \"description\": \"Leer\",\n                    \"action\": \"read\"\n                },\n                {\n                    \"description\": \"Actualizar\",\n                    \"action\": \"update\"\n                },\n                {\n                    \"description\": \"Eliminar\",\n                    \"action\": \"delete\"\n                }\n            ],\n            \"role\": [\n                {\n                    \"description\": \"Crear\",\n                    \"action\": \"create\"\n                },\n                {\n                    \"description\": \"Leer\",\n                    \"action\": \"read\"\n                },\n                {\n                    \"description\": \"Actualizar\",\n                    \"action\": \"update\"\n                },\n                {\n                    \"description\": \"Eliminar\",\n                    \"action\": \"delete\"\n                }\n            ],\n            \"dashboard\": [\n                {\n                    \"description\": \"Crear\",\n                    \"action\": \"create\"\n                },\n                {\n                    \"description\": \"Leer\",\n                    \"action\": \"read\"\n                },\n                {\n                    \"description\": \"Actualizar\",\n                    \"action\": \"update\"\n                },\n                {\n                    \"description\": \"Eliminar\",\n                    \"action\": \"delete\"\n                }\n            ]\n        }\n    }\n}"
+						},
+						{
+							"name": "Error Response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"user.sadmin@template.com\",\n    \"password\": \"user.sadmin\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/v1/auth/login",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"v1",
+										"auth",
+										"login"
+									]
+								}
+							},
+							"status": "Unprocessable Entity",
+							"code": 422,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "146"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"92-t6FKPoGNWVDYA02qkw4qa4Nnvig\""
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 04 Jul 2025 02:15:34 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"severity\": \"warning\",\n    \"message\": \"Validación de campos\",\n    \"data\": [\n        \"El correo es requerido\",\n        \"El correo no es válido\",\n        \"La contraseña es requerida\"\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Logout",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"/* try {",
+									"    const response = pm.response.json();",
+									"    console.log(\"Response JSON:\", response);",
+									"    const token = response?.data?.token;",
+									"    pm.environment.set(\"token\", token);",
+									"} catch (error) {",
+									"    console.error(\"❌ Error parsing response or setting variable:\", error);",
+									"} */"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/v1/auth/logout",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"logout"
+							]
+						},
+						"description": "El token proporcionado es revocado en la base de datos, por lo que ya no podrá ser utilizado, aun cuando su tiempo de vida no haya finalizado."
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "localhost:3000/api/v1/auth/logout",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"v1",
+										"auth",
+										"logout"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "62"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"3e-dxPVVThCyntj5q8quofUhlLR8K8\""
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 04 Jul 2025 02:31:56 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"severity\": \"success\",\n    \"message\": \"Cierre de sesión\",\n    \"data\": []\n}"
+						},
+						{
+							"name": "Token Required",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "localhost:3000/api/v1/auth/logout",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"api",
+										"v1",
+										"auth",
+										"logout"
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "75"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"4b-po/MjnZPGcrByQACeD6pGhnmvCs\""
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 04 Jul 2025 02:32:11 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"severity\": \"error\",\n    \"message\": \"El token de acceso del usuario ha expirado\"\n}"
+						}
+					]
+				}
+			],
+			"description": "Se incluyen las siguientes apis:\n\n- login - api pública\n    \n- logout - api protegida"
+		},
+		{
+			"name": "Modules",
+			"item": [
+				{
+					"name": "User",
+					"item": [
+						{
+							"name": "Get Users",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/v1/user",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"v1",
+										"user"
+									],
+									"query": [
+										{
+											"key": "limit",
+											"value": "10",
+											"disabled": true
+										},
+										{
+											"key": "page",
+											"value": "1",
+											"disabled": true
+										},
+										{
+											"key": "name",
+											"value": "user",
+											"disabled": true
+										},
+										{
+											"key": "lastName",
+											"value": "one",
+											"disabled": true
+										},
+										{
+											"key": "role",
+											"value": "2",
+											"disabled": true
+										},
+										{
+											"key": "active",
+											"value": "false",
+											"disabled": true
+										}
+									]
+								},
+								"description": "Devuelve un listado de usuarios con información detallada de los roles asociados a cada uno.\n\n🔍 Filtros de búsqueda disponibles\n\n| Parámetro | Tipo de dato | Descripción |\n| --- | --- | --- |\n| `name` | String | Búsqueda por nombre del usuario. |\n| `lastName` | String | Búsqueda por apellido del usuario. |\n| `role` | Number | ID del rol por el cual filtrar usuarios. |\n| `active` | Boolean | Filtro por usuarios activos o inactivos. |"
+							},
+							"response": [
+								{
+									"name": "Success Response",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{url}}/v1/user",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"v1",
+												"user"
+											],
+											"query": [
+												{
+													"key": "limit",
+													"value": "10",
+													"disabled": true
+												},
+												{
+													"key": "page",
+													"value": "1",
+													"disabled": true
+												},
+												{
+													"key": "name",
+													"value": "user",
+													"disabled": true
+												},
+												{
+													"key": "lastName",
+													"value": "one",
+													"disabled": true
+												},
+												{
+													"key": "role",
+													"value": "2",
+													"disabled": true
+												},
+												{
+													"key": "active",
+													"value": "false",
+													"disabled": true
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "X-Powered-By",
+											"value": "Express"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "730"
+										},
+										{
+											"key": "ETag",
+											"value": "W/\"2da-x/5Rwi6XAN9CezEcNd4+Wrt6u40\""
+										},
+										{
+											"key": "Date",
+											"value": "Fri, 04 Jul 2025 15:15:21 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Keep-Alive",
+											"value": "timeout=5"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"severity\": \"success\",\n    \"message\": \"Información de registros\",\n    \"data\": [\n        {\n            \"id\": 1,\n            \"name\": \"User\",\n            \"lastName\": \"Super admin\",\n            \"email\": \"user.sadmin@template.com\",\n            \"active\": true,\n            \"roles\": [\n                {\n                    \"id\": 1,\n                    \"name\": \"Súper Admin\",\n                    \"key\": \"root\"\n                }\n            ]\n        },\n        {\n            \"id\": 2,\n            \"name\": \"User\",\n            \"lastName\": \"Admin\",\n            \"email\": \"user.admin@template.com\",\n            \"active\": true,\n            \"roles\": [\n                {\n                    \"id\": 2,\n                    \"name\": \"Administrador\",\n                    \"key\": \"admin\"\n                }\n            ]\n        },\n        {\n            \"id\": 3,\n            \"name\": \"User\",\n            \"lastName\": \"One\",\n            \"email\": \"user.one@template.com\",\n            \"active\": true,\n            \"roles\": [\n                {\n                    \"id\": 3,\n                    \"name\": \"Usuario\",\n                    \"key\": \"user\"\n                }\n            ]\n        },\n        {\n            \"id\": 6,\n            \"name\": \"abner\",\n            \"lastName\": \"Jurado\",\n            \"email\": \"abner.jurado@gmail.com\",\n            \"active\": false,\n            \"roles\": [\n                {\n                    \"id\": 1,\n                    \"name\": \"Súper Admin\",\n                    \"key\": \"root\"\n                }\n            ]\n        }\n    ],\n    \"paginated\": {\n        \"totalRecords\": 4,\n        \"totalPerPage\": 4,\n        \"totalPages\": 1,\n        \"page\": 1,\n        \"limit\": 10\n    }\n}"
+								}
+							]
+						},
+						{
+							"name": "Get By Id",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/v1/user/1",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"v1",
+										"user",
+										"1"
+									]
+								},
+								"description": "Devuelve la información de un registro por medio del **ID**\n\n| Parámetro | Tipo de dato | Descripción |\n| --- | --- | --- |\n| `ID` | Number | ID del usuario a buscar. |"
+							},
+							"response": [
+								{
+									"name": "Success Response",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{url}}/v1/user/1",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"v1",
+												"user",
+												"1"
+											],
+											"query": [
+												{
+													"key": "active",
+													"value": "false",
+													"disabled": true
+												},
+												{
+													"key": "role",
+													"value": "1",
+													"disabled": true
+												},
+												{
+													"key": "limit",
+													"value": "s",
+													"disabled": true
+												},
+												{
+													"key": "page",
+													"value": "d",
+													"disabled": true
+												},
+												{
+													"key": "name",
+													"value": "user",
+													"disabled": true
+												},
+												{
+													"key": "lastName",
+													"value": "one",
+													"disabled": true
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "X-Powered-By",
+											"value": "Express"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "218"
+										},
+										{
+											"key": "ETag",
+											"value": "W/\"da-3DPsLrtmTkS3CEhEtLSQP4q0tMc\""
+										},
+										{
+											"key": "Date",
+											"value": "Fri, 04 Jul 2025 15:02:38 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Keep-Alive",
+											"value": "timeout=5"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"severity\": \"success\",\n    \"message\": \"Información de registros\",\n    \"data\": {\n        \"id\": 1,\n        \"name\": \"User\",\n        \"lastName\": \"Super admin\",\n        \"email\": \"user.sadmin@template.com\",\n        \"active\": true,\n        \"roles\": [\n            {\n                \"id\": 1,\n                \"name\": \"Súper Admin\",\n                \"key\": \"root\"\n            }\n        ]\n    }\n}"
+								},
+								{
+									"name": "Not Found Response",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{url}}/v1/user/11",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"v1",
+												"user",
+												"11"
+											],
+											"query": [
+												{
+													"key": "active",
+													"value": "false",
+													"disabled": true
+												},
+												{
+													"key": "role",
+													"value": "1",
+													"disabled": true
+												},
+												{
+													"key": "limit",
+													"value": "s",
+													"disabled": true
+												},
+												{
+													"key": "page",
+													"value": "d",
+													"disabled": true
+												},
+												{
+													"key": "name",
+													"value": "user",
+													"disabled": true
+												},
+												{
+													"key": "lastName",
+													"value": "one",
+													"disabled": true
+												}
+											]
+										}
+									},
+									"status": "Not Found",
+									"code": 404,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "X-Powered-By",
+											"value": "Express"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "61"
+										},
+										{
+											"key": "ETag",
+											"value": "W/\"3d-tU0efWWSdXNHyPNMCuHJ30y02QQ\""
+										},
+										{
+											"key": "Date",
+											"value": "Fri, 04 Jul 2025 15:02:55 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Keep-Alive",
+											"value": "timeout=5"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"severity\": \"warning\",\n    \"message\": \"No hay registros\",\n    \"data\": []\n}"
+								}
+							]
+						},
+						{
+							"name": "Create",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"abner\",\n    \"lastName\": \"Jurado\",\n    \"email\": \"abner.jurado@template.com\",\n    \"password\": \"Abn3r.Jra\",\n    \"role\": [\n        2\n    ]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/v1/user/",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"v1",
+										"user",
+										""
+									]
+								},
+								"description": "Crea un nuevo usuario en el sistema, asignándole uno o varios roles.\n\n| Campo | Tipo de dato | Requerido | Descripción |\n| --- | --- | --- | --- |\n| `name` | String | ✅ | Nombre del usuario. |\n| `lastName` | String | ✅ | Apellido(s) del usuario. |\n| `email` | String | ✅ | Correo electrónico . |\n| `password` | String | ✅ | Contraseña del usuario. |\n| `role` | Number\\[\\] | ✅ | Arreglo de ID(s) de rol a asignar. |\n\n🔍 Ejemplo de solicitud\n\n``` json\n{\n    \"name\": \"abner\",\n    \"lastName\": \"Jurado\",\n    \"email\": \"abner.jurado@template.com\",\n    \"password\": \"Abn3r.Jra\",\n    \"role\": [1]\n}\n\n ```"
+							},
+							"response": [
+								{
+									"name": "Success Response",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"name\": \"abner\",\n    \"lastName\": \"Jurado\",\n    \"email\": \"abner.jurado@template.com\",\n    \"password\": \"Abn3r.Jra\",\n    \"role\": [\n        2\n    ]\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/v1/user/",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"v1",
+												"user",
+												""
+											]
+										}
+									},
+									"status": "Created",
+									"code": 201,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "X-Powered-By",
+											"value": "Express"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "222"
+										},
+										{
+											"key": "ETag",
+											"value": "W/\"de-jbnkqfDp8JNOwREdsSmElYfeSlI\""
+										},
+										{
+											"key": "Date",
+											"value": "Fri, 04 Jul 2025 15:19:56 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Keep-Alive",
+											"value": "timeout=5"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"severity\": \"success\",\n    \"message\": \"Registro creado correctamente\",\n    \"data\": {\n        \"id\": 7,\n        \"name\": \"abner\",\n        \"lastName\": \"Jurado\",\n        \"email\": \"abner.jurado@template.com\",\n        \"active\": false,\n        \"roles\": [\n            {\n                \"id\": 2,\n                \"name\": \"Administrador\",\n                \"key\": \"admin\"\n            }\n        ]\n    }\n}"
+								}
+							]
+						},
+						{
+							"name": "Update",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"abner\",\n    \"lastName\": \"Jurado\",\n    \"email\": \"abner.jurado@template.com\",\n    \"active\": true,\n    \"role\": [\n        1\n    ]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/v1/user/7",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"v1",
+										"user",
+										"7"
+									]
+								},
+								"description": "Actualización de usuario en el sistema, asignándole uno o varios roles.\n\n| Campo | Tipo de dato | Requerido | Descripción |\n| --- | --- | --- | --- |\n| `name` | String | ✅ | Nombre del usuario. |\n| `lastName` | String | ✅ | Apellido(s) del usuario. |\n| `email` | String | ✅ | Correo electrónico . |\n| `role` | Number\\[\\] | ✅ | Arreglo de ID(s) de rol a asignar. |\n| `active` | Boolean | ✅ | Indicador de usuario activo o inactivo. |\n| `password` | String | Opcional | Si el campo no se envia, la contraseña del usuario no se verá afectada. |\n\n🔍 Ejemplo de solicitud\n\n``` json\n{\n    \"name\": \"abner\",\n    \"lastName\": \"Jurado\",\n    \"email\": \"abner.jurado@template.com\",\n    \"active\": true\n    \"role\": [2]\n}\n\n ```"
+							},
+							"response": [
+								{
+									"name": "Success Response",
+									"originalRequest": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"name\": \"abner\",\n    \"lastName\": \"Jurado\",\n    \"email\": \"abner.jurado@template.com\",\n    \"active\": true,\n    \"role\": [\n        1\n    ]\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/v1/user/7",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"v1",
+												"user",
+												"7"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "X-Powered-By",
+											"value": "Express"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "224"
+										},
+										{
+											"key": "ETag",
+											"value": "W/\"e0-hkeNxR1mqIJtRji+Q7jJjdOhXyk\""
+										},
+										{
+											"key": "Date",
+											"value": "Fri, 04 Jul 2025 15:36:27 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Keep-Alive",
+											"value": "timeout=5"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"severity\": \"success\",\n    \"message\": \"Registro actualizado correctamente\",\n    \"data\": {\n        \"id\": 7,\n        \"name\": \"abner\",\n        \"lastName\": \"Jurado\",\n        \"email\": \"abner.jurado@template.com\",\n        \"active\": true,\n        \"roles\": [\n            {\n                \"id\": 1,\n                \"name\": \"Súper Admin\",\n                \"key\": \"root\"\n            }\n        ]\n    }\n}"
+								},
+								{
+									"name": "Not Found Response",
+									"originalRequest": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"name\": \"abner\",\n    \"lastName\": \"Jurado\",\n    \"email\": \"abner.jurado@template.com\",\n    \"active\": true,\n    \"role\": [\n        1\n    ]\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/v1/user/71",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"v1",
+												"user",
+												"71"
+											]
+										}
+									},
+									"status": "Not Found",
+									"code": 404,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "X-Powered-By",
+											"value": "Express"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "66"
+										},
+										{
+											"key": "ETag",
+											"value": "W/\"42-k8R6ENgRuf8fFTFX5g0ALDIfy68\""
+										},
+										{
+											"key": "Date",
+											"value": "Fri, 04 Jul 2025 15:37:27 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Keep-Alive",
+											"value": "timeout=5"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"severity\": \"warning\",\n    \"message\": \"El registro no existe\",\n    \"data\": []\n}"
+								},
+								{
+									"name": "Validate Response",
+									"originalRequest": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"name\": \"abner\",\n    \"lastName\": \"Jurado\",\n    \"email\": \"abner.jurado@template.com\",\n    \"active\": true,\n    \"role\": [\n        1\n    ]\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/v1/user/sd",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"v1",
+												"user",
+												"sd"
+											]
+										}
+									},
+									"status": "Unprocessable Entity",
+									"code": 422,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "X-Powered-By",
+											"value": "Express"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "131"
+										},
+										{
+											"key": "ETag",
+											"value": "W/\"83-1oHCgiSryA95sdP3GpV08DYTkpY\""
+										},
+										{
+											"key": "Date",
+											"value": "Fri, 04 Jul 2025 15:37:49 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Keep-Alive",
+											"value": "timeout=5"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"severity\": \"warning\",\n    \"message\": \"Validación de campos\",\n    \"data\": [\n        \"ID: Debe ser un número entero positivo sin letras ni símbolos\"\n    ]\n}"
+								}
+							]
+						}
+					],
+					"description": "CRUD de usuarios\n\n1. Listado de usuarios\n    \n2. Obtener usuario por ID\n    \n3. Crear usuario\n    \n    1. Se incluye la asignación de roles.\n        \n4. Actualización de usuario\n    \n    1. Se incluye la administración de roles."
+				},
+				{
+					"name": "Roles",
+					"item": [
+						{
+							"name": "Get Roles",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/v1/role/",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"v1",
+										"role",
+										""
+									],
+									"query": [
+										{
+											"key": "limit",
+											"value": "1",
+											"disabled": true
+										},
+										{
+											"key": "page",
+											"value": "10",
+											"disabled": true
+										},
+										{
+											"key": "name",
+											"value": "admin",
+											"disabled": true
+										},
+										{
+											"key": "description",
+											"value": "súper",
+											"disabled": true
+										}
+									]
+								},
+								"description": "Devuelve un listado de roles con información detallada de los permisos asociados a cada uno.\n\n🔍 Filtros de búsqueda disponibles\n\n| Parámetro | Tipo de dato | Descripción |\n| --- | --- | --- |\n| `name` | String | Búsqueda por nombre del role. |\n| `description` | String | Búsqueda por descripción del role. |"
+							},
+							"response": [
+								{
+									"name": "Success Response",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{url}}/v1/role/",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"v1",
+												"role",
+												""
+											],
+											"query": [
+												{
+													"key": "limit",
+													"value": "1",
+													"disabled": true
+												},
+												{
+													"key": "page",
+													"value": "10",
+													"disabled": true
+												},
+												{
+													"key": "name",
+													"value": "admin",
+													"disabled": true
+												},
+												{
+													"key": "description",
+													"value": "súper",
+													"disabled": true
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "X-Powered-By",
+											"value": "Express"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "2168"
+										},
+										{
+											"key": "ETag",
+											"value": "W/\"878-NwJAgDqu6okCO4thSUXcZ5WazgU\""
+										},
+										{
+											"key": "Date",
+											"value": "Fri, 04 Jul 2025 15:39:15 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Keep-Alive",
+											"value": "timeout=5"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"severity\": \"success\",\n    \"message\": \"Información de registros\",\n    \"data\": [\n        {\n            \"id\": 1,\n            \"name\": \"Súper Admin\",\n            \"key\": \"root\",\n            \"description\": \"Rol del súper administrador\",\n            \"active\": true,\n            \"permissions\": {\n                \"user\": [\n                    {\n                        \"description\": \"Crear\",\n                        \"action\": \"create\"\n                    },\n                    {\n                        \"description\": \"Leer\",\n                        \"action\": \"read\"\n                    },\n                    {\n                        \"description\": \"Actualizar\",\n                        \"action\": \"update\"\n                    },\n                    {\n                        \"description\": \"Eliminar\",\n                        \"action\": \"delete\"\n                    }\n                ],\n                \"role\": [\n                    {\n                        \"description\": \"Crear\",\n                        \"action\": \"create\"\n                    },\n                    {\n                        \"description\": \"Leer\",\n                        \"action\": \"read\"\n                    },\n                    {\n                        \"description\": \"Actualizar\",\n                        \"action\": \"update\"\n                    },\n                    {\n                        \"description\": \"Eliminar\",\n                        \"action\": \"delete\"\n                    }\n                ],\n                \"dashboard\": [\n                    {\n                        \"description\": \"Crear\",\n                        \"action\": \"create\"\n                    },\n                    {\n                        \"description\": \"Leer\",\n                        \"action\": \"read\"\n                    },\n                    {\n                        \"description\": \"Actualizar\",\n                        \"action\": \"update\"\n                    },\n                    {\n                        \"description\": \"Eliminar\",\n                        \"action\": \"delete\"\n                    }\n                ]\n            }\n        },\n        {\n            \"id\": 2,\n            \"name\": \"Administrador\",\n            \"key\": \"admin\",\n            \"description\": \"Rol del administrador\",\n            \"active\": true,\n            \"permissions\": {\n                \"user\": [\n                    {\n                        \"description\": \"Crear\",\n                        \"action\": \"create\"\n                    },\n                    {\n                        \"description\": \"Leer\",\n                        \"action\": \"read\"\n                    },\n                    {\n                        \"description\": \"Actualizar\",\n                        \"action\": \"update\"\n                    },\n                    {\n                        \"description\": \"Eliminar\",\n                        \"action\": \"delete\"\n                    }\n                ],\n                \"dashboard\": [\n                    {\n                        \"description\": \"Crear\",\n                        \"action\": \"create\"\n                    },\n                    {\n                        \"description\": \"Leer\",\n                        \"action\": \"read\"\n                    },\n                    {\n                        \"description\": \"Actualizar\",\n                        \"action\": \"update\"\n                    },\n                    {\n                        \"description\": \"Eliminar\",\n                        \"action\": \"delete\"\n                    }\n                ]\n            }\n        },\n        {\n            \"id\": 3,\n            \"name\": \"Usuario\",\n            \"key\": \"user\",\n            \"description\": \"Rol de usuario\",\n            \"active\": true,\n            \"permissions\": {\n                \"dashboard\": [\n                    {\n                        \"description\": \"Leer\",\n                        \"action\": \"read\"\n                    }\n                ]\n            }\n        }\n    ]\n}"
+								}
+							]
+						},
+						{
+							"name": "Get By Id",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/v1/role/8",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"v1",
+										"role",
+										"8"
+									]
+								},
+								"description": "Devuelve la información de un registro por medio del **ID**\n\n| Parámetro | Tipo de dato | Descripción |\n| --- | --- | --- |\n| `ID` | Number | ID del role a buscar. |"
+							},
+							"response": []
+						},
+						{
+							"name": "Create",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Tester\",\n    \"key\": \"test\",\n    \"description\": \"Role de testeo\",\n    \"modules\": [\n        {\n            \"moduleKey\": \"role\",\n            \"permissions\": [\n                \"read\"\n            ]\n        }\n    ]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/v1/role/",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"v1",
+										"role",
+										""
+									]
+								},
+								"description": "Crea un nuevo usuario en el sistema, asignándole uno o varios roles.\n\n| Campo | Tipo de dato | Requerido | Descripción |\n| --- | --- | --- | --- |\n| `name` | String | ✅ | Nombre del role. |\n| `key` | String | ✅ | Clave única del role. |\n| `description` | String | ✅ | Descripción del role. |\n| `modules` | Object\\[\\] | ✅ | Lista de módulos con los permisos asociados al rol. |\n\n⚠️ Nota:  \nEl campo modules debe contener al menos un módulo con uno o más permisos válidos.\n\n📦 Estructura de modules  \nCada objeto dentro del arreglo modules debe tener la siguiente estructura:\n\n| Campo | Tipo | Requerido | Descripción |\n| --- | --- | --- | --- |\n| `moduleKey` | String | ✅ | Clave del módulo a asignar. |\n| `permissions` | String\\[\\] | ✅ | Lista de permisos asignados al módulo. |\n\n🔍 Ejemplo de solicitud\n\n``` json\n{\n    \"name\": \"Tester\",\n    \"key\": \"test\",\n    \"description\": \"Role de testeo\",\n    \"modules\": [\n        {\n            \"moduleKey\": \"role\",\n            \"permissions\": [\n                \"read\"\n            ]\n        }\n    ]\n}\n\n ```"
+							},
+							"response": []
+						},
+						{
+							"name": "Update",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Demo\",\n    \"key\": \"demo\",\n    \"description\": \"Role demo\",\n    \"modules\": [\n        {\n            \"moduleKey\": \"role\",\n            \"permissions\": [\n                \"read\"\n            ]\n        },\n        {\n            \"moduleKey\": \"user\",\n            \"permissions\": [\n                \"read\"\n            ]\n        }\n    ]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/v1/role/8",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"v1",
+										"role",
+										"8"
+									]
+								},
+								"description": "Crea un nuevo usuario en el sistema, asignándole uno o varios roles.\n\n| Campo | Tipo de dato | Requerido | Descripción |\n| --- | --- | --- | --- |\n| `name` | String | ✅ | Nombre del role. |\n| `key` | String | ✅ | Clave única del role. |\n| `description` | String | ✅ | Descripción del role. |\n| `modules` | Object\\[\\] | ✅ | Lista de módulos con los permisos asociados al rol. |\n\n⚠️ Nota:  \nEl campo modules debe contener al menos un módulo con uno o más permisos válidos.\n\n📦 Estructura de modules  \nCada objeto dentro del arreglo modules debe tener la siguiente estructura:\n\n| Campo | Tipo | Requerido | Descripción |\n| --- | --- | --- | --- |\n| `moduleKey` | String | ✅ | Clave del módulo a asignar. |\n| `permissions` | String\\[\\] | ✅ | Lista de permisos asignados al módulo. |\n\n🔍 Ejemplo de solicitud\n\n``` json\n{\n    \"name\": \"Tester\",\n    \"key\": \"test\",\n    \"description\": \"Role de testeo\",\n    \"modules\": [\n        {\n            \"moduleKey\": \"role\",\n            \"permissions\": [\n                \"read\"\n            ]\n        }\n    ]\n}\n\n ```"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Module",
+					"item": [
+						{
+							"name": "Get Modules",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/v1/module",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"v1",
+										"module"
+									],
+									"query": [
+										{
+											"key": "name",
+											"value": "roles",
+											"disabled": true
+										}
+									]
+								},
+								"description": "Devuelve un listado de modulos del sistema con información detallada de los permisos asociados a cada uno.\n\n🔍 Filtros de búsqueda disponibles\n\n| Parámetro | Tipo de dato | Descripción |\n| --- | --- | --- |\n| `name` | String | Búsqueda por nombre del role. |"
+							},
+							"response": []
+						},
+						{
+							"name": "Get Module",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/v1/module/4",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"v1",
+										"module",
+										"4"
+									]
+								},
+								"description": "Devuelve la información de un registro por medio del **ID**\n\n| Parámetro | Tipo de dato | Descripción |\n| --- | --- | --- |\n| `ID` | Number | ID del modulo a buscar. |"
+							},
+							"response": []
+						},
+						{
+							"name": "Create Module",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Mapa público\",\n    \"key\": \"map\",\n    \"description\": \"Mapa público de sitios\",\n    \"permissions\": [\"read\"]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/v1/module",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"v1",
+										"module"
+									]
+								},
+								"description": "Crea un nuevo módulo en el sistema, asignándole uno o varios permisos previamente registrados.\n\n📥 Campos del cuerpo de la solicitud\n\n| Campo | Tipo de dato | Requerido | Descripción |\n| --- | --- | --- | --- |\n| `name` | String | ✅ | Nombre del módulo. |\n| `key` | String | ✅ | Clave única que identifica al módulo. |\n| `description` | String | ✅ | Breve descripción del propósito del módulo. |\n| `permissions` | String\\[\\] | ✅ | Lista de permisos que serán asociados al módulo. |\n\n### ✅ Validaciones incluidas\n\n1. **Nombre del módulo**\n    - Verifica que el nombre no esté duplicado.\n2. **Clave (****`key`****) del módulo**\n    - Debe ser única en el sistema. No se permiten claves repetidas.\n3. **Permisos**\n    - Se valida que cada permiso enviado exista previamente en el sistema.\n    - No se permite asignar permisos inexistentes o inválidos."
+							},
+							"response": []
+						},
+						{
+							"name": "Update Module",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Sitios\",\n    \"key\": \"site\",\n    \"description\": \"Administración de sitios\",\n    \"permissions\": [\"read\"]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{url}}/v1/module/4",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"v1",
+										"module",
+										"4"
+									]
+								},
+								"description": "Actualización de un módulo existente en el sistema, asignándole uno o varios permisos previamente registrados.\n\n📥 Campos del cuerpo de la solicitud\n\n| Campo | Tipo de dato | Requerido | Descripción |\n| --- | --- | --- | --- |\n| `name` | String | ✅ | Nombre del módulo. |\n| `description` | String | ✅ | Breve descripción del propósito del módulo. |\n| `permissions` | String\\[\\] | ✅ | Lista de permisos que serán asociados al módulo. |\n\n### ✅ Validaciones incluidas\n\n1. **Nombre del módulo**\n    \n    - Verifica que el nombre no esté duplicado.\n        \n2. **Clave (****`key`****) del módulo**\n    \n    - Debe ser única en el sistema. No se permiten claves repetidas.\n        \n3. **Permisos**\n    \n    - Se valida que cada permiso enviado exista previamente en el sistema.\n        \n    - No se permite asignar permisos inexistentes o inválidos."
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Catalogs",
+					"item": [
+						{
+							"name": "Module",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/v1/catalog/module",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"v1",
+										"catalog",
+										"module"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Permission List",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/v1/catalog/permission/list",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"v1",
+										"catalog",
+										"permission",
+										"list"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Role",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/v1/catalog/role",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"v1",
+										"catalog",
+										"role"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "User",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/v1/catalog/user",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"v1",
+										"catalog",
+										"user"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Upload files and delete temporary files",
+					"item": [
+						{
+							"name": "File Temp",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"type": "file",
+											"src": "/home/abnerjra/Imágenes/Capturas de pantalla/Captura desde 2025-05-27 16-36-05.png"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{url}}/v1/file/upload/temp/user",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"v1",
+										"file",
+										"upload",
+										"temp",
+										"user"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Clear Temp",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/v1/clear/temp/user",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"v1",
+										"clear",
+										"temp",
+										"user"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Clear All Temp",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{url}}/v1/clear/all/temp",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"v1",
+										"clear",
+										"all",
+										"temp"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			],
+			"description": "Todas las APIs listadas en esta sección requieren un token de acceso válido.  \nEn caso de no proporcionar un token o de enviar un token inválido o expirado, se responderá con un código HTTP 401 y el siguiente mensaje:\n\n``` json\n{\n    \"severity\": \"error\",\n    \"message\": \"El token de acceso del usuario ha expirado\"\n}\n\n ```\n\n🗂 Funcionalidades protegidas\n\n1. Administración de usuarios.\n2. Administración de roles y permisos.\n3. Administración de módulos.\n4. Administración de carga de archivos.\n5. Catálogos.\n    \n\n🔎 Filtros comunes  \nTodos los listados, excepto los catálogos, comparten los siguientes parámetros de paginación:\n\n| Parámetro | Tipo de dato | Descripción |\n| --- | --- | --- |\n| `limit` | Number | Número de registros por página.  <br>Valor por defecto: **10** |\n| `page` | Number | Número de la página actual.  <br>Valor por defecto: **1** |"
+		},
+		{
+			"name": "Test",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/v1/test/welcome",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"v1",
+						"test",
+						"welcome"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
